@@ -28,7 +28,7 @@ def github_read_file(file_path):
 
 
 def encontrar_link_extm(lista, valor_procurado):
-    
+
     links = [link["link"] for link in lista]
     pattern = rf"http://[^/]+(/live)?/\d+/[a-zA-Z0-9]+/{valor_procurado}+(\.m3u8|\.ts)?"
 
@@ -40,7 +40,7 @@ def encontrar_link_extm(lista, valor_procurado):
 
 
 def transformar_link(link_original, action):
-    
+
     # Definir o padrão de regex com 4 grupos
     padrao_regex = r"(http://[^/]+)/([^/]+)/([^/]+)/([^/]+)"
     # Procurar por correspondências no link original
@@ -96,7 +96,17 @@ def login(username, password, url):
         },
     }
 
-def get_redirect_chain(url):
+
+def get_redirect_vod_series(url):
+    response = requests.get(url, allow_redirects=True, stream=True)
+    redirect_chain = [
+        resp.url for resp in response.history
+    ]  # URLs dos redirecionamentos
+    redirect_chain.append(response.url)  # URL final
+    return redirect_chain[-1]
+
+
+def get_redirect_live(url):
     curl_command = ["curl", "-s", "-i", url]
     result = subprocess.run(curl_command, capture_output=True, text=True)
     if result.returncode == 0:
@@ -161,4 +171,3 @@ class ChangeLink:
 
 def change(url, ext):
     return ChangeLink(url, ext).change()
-
